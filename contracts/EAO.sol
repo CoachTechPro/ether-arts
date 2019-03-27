@@ -42,8 +42,8 @@ contract EAO is usingOraclize, Ownable{
   }
 
   constructor(address _addrEAS, address _addrEAS_roll, address _addrEAS_types, address _addrEAS_artworks, address _addrEAS_mission, address _addr_EAS_platform) public{
-    OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);  // for ethereum-bridge
-    //OAR = OraclizeAddrResolverI(0x146500cfd35B22E4A392Fe0aDc06De1a1368Ed48);  // for RINKEBY TESTNET
+    //OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);  // for ethereum-bridge
+    OAR = OraclizeAddrResolverI(0x146500cfd35B22E4A392Fe0aDc06De1a1368Ed48);  // for RINKEBY TESTNET
     //OAR = OraclizeAddrResolverI(0xc03A2615D5efaf5F49F60B7BB6583eaec212fdf1);  // for ROPSTEN TESTNET
     //OAR = OraclizeAddrResolverI(0xB7A07BcF2Ba2f2703b24C0691b5278999C59AC7e);  // for KOVAN TESTNET
     //OAR = OraclizeAddrResolverI(0x51efaF4c8B3C9AfBD5aB9F4bbC82784Ab6ef8fAA);  // for Browser Solidity
@@ -125,9 +125,12 @@ contract EAO is usingOraclize, Ownable{
       stage_reward += address(this).balance.mul(uint(IFEAS.WINNERS1_DIST_RATIO())).div(100);
     }
     if(IFEAS_mission.GetWinner2Length(_stageNo) > 0){
-      stage_reward += address(this).balance.mul(uint(IFEAS.WINNERS2_DIST_RATIO())).div(100);  
+      stage_reward += address(this).balance.mul(uint(IFEAS.WINNERS2_DIST_RATIO())).div(200);  
     }
-    
+    if(IFEAS_mission.GetWinner3Length(_stageNo) > 0){
+      stage_reward += address(this).balance.mul(uint(IFEAS.WINNERS2_DIST_RATIO())).div(200);  
+    }
+
     address payable addrTo = address(uint160(_EAO_MISSION_ADDR));
     addrTo.transfer(stage_reward);
     IFEAS_mission.FinalizeStage(_stageNo);  // Record last card-id that has been issued, then increase stage number.
