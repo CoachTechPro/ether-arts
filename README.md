@@ -33,12 +33,13 @@ In return for your compliance, we promise that
 * announce if there is any update to the code while the test is being conducted.
 
 ### A Sample Submission Form
-* What: A brief description
-* When: When does this issue happen?
-* Impact: How does this affect the gameplay or the user?
-* How to reproduce: Details on how to reproduce this issue, including hash/tx info
-* Suggestion: Brownie points those who suggest how to fix this issue!
-* Note: Any other info we should be aware about this issue
+* *What*: A brief description
+* *When*: When does this issue happen?
+* *Impact*: How does this affect the gameplay or the user?
+* *How to reproduce*: Details on how to reproduce this issue, including hash/tx info
+* *Suggestion*: Brownie points those who suggest how to fix this issue!
+* *Note*: Any other info we should be aware about this issue
+* *Address*: user's metamask account to receive bounty card
 
 ### Rewards
 * Depending on the severity of the reported issue, OLIVE (0.4 ETH) to BROWN (5.0 ETH) cards will be assigned to the top 10 bug reporters.
