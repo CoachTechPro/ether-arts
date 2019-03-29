@@ -1,0 +1,392 @@
+var EAS = artifacts.require("./EAS.sol");
+var EAS_types = artifacts.require("./EAS_types.sol");
+var EAS_artworks = artifacts.require("./EAS_artworks.sol");
+var EAS_roll = artifacts.require("./EAS_roll.sol");
+var EAS_mission = artifacts.require("./EAS_mission.sol");
+var EAS_mixedQuery = artifacts.require("./EAS_mixedQuery.sol");
+
+var EAO = artifacts.require("./EAO.sol");
+var EAO_mission = artifacts.require("./EAO_mission.sol");
+var EAO_roll = artifacts.require("./EAO_roll.sol");
+
+var EAM = artifacts.require("./EAM.sol");
+
+var colorString = ["green", "olive", "orange", "red", "gray", "blue", "brown", "wine", "indigo", "rosybrown", "amber", "silver", "gold", "emerald", "sapphire", "ruby", "diamond"];
+var cardColorEnum = Object.freeze({
+  "GREEN":0, 
+  "OLIVE":1, 
+  "ORANGE":2,  
+  "RED":3, 
+  "GRAY":4, 
+  "BLUE":5,  
+  "BROWN":6, 
+  "WINE":7, 
+  "INDIGO":8,  
+  "ROSYBROWN":9, 
+  "AMBER":10,
+  "SILVER":11, 
+  "GOLD":12,  
+  "EMERALD":13, 
+  "SAPPHIRE":14,
+  "RUBY":15,
+  "DIAMOND":16
+});
+
+
+var jsonDataRaw = [
+  {
+    "note" : "blue - 7 x 3.5 eth",
+    "id": 0,
+    "color":"blue",
+    "reserved" : 2,
+    "maxBounty": 1,
+    "title": "ROMANTIC LANDSCAPE",
+    "year": "1944",
+    "description1": "Luigi Russolo, Italy",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/001-luigi-russolo-romantic-landscape-1944-lg.jpg",
+    "image_sm": "artworks/001-luigi-russolo-romantic-landscape-1944-sm.jpg",
+    "image_direction": "square",
+    "display": "true"
+  },
+  {
+    "note" : "orange - 21 x 1.2 eth",
+    "id": 1,
+    "color":"orange",
+    "reserved" : 11,
+    "maxBounty": 1,
+    "title": "SUNSET ON THE SEINE",
+    "year": "2018",
+    "description1": "Claud Monet, France",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/002-claude_monet_sunset-on-the-seine-lg.jpg",
+    "image_sm": "artworks/002-claude_monet_sunset-on-the-seine-sm.jpg",
+    "image_direction": "wide",
+    "display": "true"
+  },
+  {
+    "note" : "blue - 7 x 3.5 eth",
+    "id": 2,
+    "color":"blue",
+    "reserved" : 3,
+    "maxBounty": 1,
+    "title": "THE HARBINGER OF AUTUMN",
+    "year": "2018",
+    "description1": "Paul Klee, Germany",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/003-The-Harbinger-of-Autumn-lg.jpg",
+    "image_sm": "artworks/003-The-Harbinger-of-Autumn-sm.jpg",
+    "image_direction": "square",
+    "display": "true"
+  },  
+  {
+    "note" : "brown - 5 x 5.0 eth",
+    "id": 3,
+    "color":"brown",
+    "reserved" : 2,
+    "maxBounty": 1,
+    "title": "THREE GALLOPING HORSES",
+    "year": "2018",
+    "description1": "Xu Beihong, China",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/001-xu-beihong_three-galloping-horses-sm.jpg",
+    "image_sm": "artworks/001-xu-beihong_three-galloping-horses-sm.jpg",
+    "image_direction": "wide",
+    "display": "true"
+  },
+  {
+    "note" : "indigo - 2 x 12.5eth",
+    "id": 4,
+    "color":"indigo",
+    "reserved" : 0,
+    "maxBounty": 0,
+    "title": "THE BRIDGE AT VILLENEUVE",
+    "year": "2018",
+    "description1": "ALFRED SISLEY, England",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/005-alfred_sisley_The_Bridge_at_Villeneuve_la_Garenna_lg.jpg",
+    "image_sm": "artworks/005-alfred_sisley_The_Bridge_at_Villeneuve_la_Garenna_sm.jpg",
+    "image_direction": "square",
+    "display": "true"
+  },
+  {
+    "note" : "wine - 3 x 8.0 eth",
+    "id": 5,
+    "color":"wine",
+    "reserved" : 0,
+    "maxBounty": 0,
+    "title": "AURORA BOREALE",
+    "year": "2018",
+    "description1": "Luigi Russolo, Italy",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/006-luigi-russolo-aurora-boreale-1938-lg.jpg",
+    "image_sm": "artworks/006-luigi-russolo-aurora-boreale-1938-sm.jpg",
+    "image_direction": "square",
+    "display": "true"
+  },
+  {
+    "note" : "gray - 10 x 2.5 eth",
+    "id": 6,
+    "color":"gray",
+    "reserved" : 3,
+    "maxBounty": 1,
+    "title": "HORIZONALE",
+    "year": "2018",
+    "description1": "Vasily Kandinsky, Russia",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/007-Horizonale-Vasily-Kandinsky-lg.jpg",
+    "image_sm": "artworks/007-Horizonale-Vasily-Kandinsky-sm.jpg",
+    "image_direction": "wide",
+    "display": "true"
+  },
+  {
+    "note" : "silver - 20 x not for sale",
+    "id": 7,
+    "color":"silver",
+    "reserved" : 0,
+    "maxBounty": 0,
+    "title": "AFTER HARVEST",
+    "year": "2018",
+    "description1": "Ether-arts.io",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 0,
+    "image_lg": "artworks/008-AfterHarvest-lg.jpg",
+    "image_sm": "artworks/008-AfterHarvest-sm.jpg",
+    "image_direction": "wide",
+    "recipe1": "orange",
+    "recipe2": "olive",
+    "recipe3": "none",
+    "display": "true"
+  },
+  {
+    "note" : "olive - 33 x 0.75 eth",
+    "id": 8,
+    "color":"olive",
+    "reserved" : 21,
+    "maxBounty": 2,
+    "title": "GREEN STRIPE",
+    "year": "1917",
+    "description1": "Olga Rozanova, Russia",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/009-olga-rozanova-green-stripe-1917-lg.jpg",
+    "image_sm": "artworks/009-olga-rozanova-green-stripe-1917-sm.jpg",
+    "image_direction": "long",
+    "display": "true"
+  },
+  {
+    "note" : "red - 13 x 1.9 eth",
+    "id": 9,
+    "color":"red",
+    "reserved" : 4,
+    "maxBounty": 2,
+    "title": "THE RED SAILS",
+    "year": "1906",
+    "description1": "Andre Derain, France",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/010-andre-derain-the-red-sails-1906-lg.jpg",
+    "image_sm": "artworks/010-andre-derain-the-red-sails-1906-sm.jpg",
+    "image_direction": "square",
+    "display": "true"
+  },
+  {
+    "note" : "brown - 5 x 5.0 eth",
+    "id": 10,
+    "color":"brown",
+    "reserved" : 0,
+    "maxBounty": 0,
+    "title": "COLD CITY",
+    "year": "1922",
+    "description1": "Paul Klee, Germany",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/011-Cold-City-Paul-Klee-lg.jpg",
+    "image_sm": "artworks/011-Cold-City-Paul-Klee-sm.jpg",
+    "image_direction": "wide",
+    "display": "false"
+  },
+  {
+    "note" : "orange - 21 x 1.2 eth",
+    "id": 11,
+    "color":"orange",
+    "reserved" : 10,
+    "maxBounty": 2,
+    "title": "HARVESTERS",
+    "year": "1922",
+    "description1": "Anna Ancher, Germany",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/012-anna_ancher_harvesters-lg.jpg",
+    "image_sm": "artworks/012-anna_ancher_harvesters-sm.jpg",
+    "image_direction": "square",
+    "display": "false"
+  },
+  {
+    "note" : "blue - 50 x 0.5eth",
+    "id": 12,
+    "color":"blue",
+    "reserved" : 1,
+    "maxBounty": 1,
+    "title": "SEASCAPE",
+    "year": "1922",
+    "description1": "Emily Carr, Canada",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/013-EmilyCarr__seascape_lg.jpg",
+    "image_sm": "artworks/013-EmilyCarr__seascape_sm.jpg",
+    "image_direction": "long",
+    "display": "false"
+  },
+  {
+    "note": "gold - 10 x not for sale",
+    "id": 13,
+    "color":"gold",
+    "reserved" : 0,
+    "maxBounty": 0,
+    "title": "GOLDEN WAVES",
+    "year": "",
+    "description1": "Ether-arts.io",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 0,
+    "image_lg": "artworks/014-YellowFlowers-lg.jpg",
+    "image_sm": "artworks/014-YellowFlowers-sm.jpg",
+    "image_direction": "wide",
+    "recipe1": "red",
+    "recipe2": "brown",
+    "display": "false"
+  },
+  {
+    "note" : "green - 50 x 0.5eth",
+    "id": 14,
+    "color":"green",
+    "reserved" : 20,
+    "maxBounty": 4,
+    "title": "TESTING1",
+    "year": "1922",
+    "description1": "QB",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/015-KatsushikaHokusai__ShowerBelowTheSummit_lg.jpg",
+    "image_sm": "artworks/015-KatsushikaHokusai__ShowerBelowTheSummit_sm.jpg",
+    "image_direction": "long",
+    "display": "false"
+  },
+  {
+    "note" : "brown - 5 x 5.0 eth",
+    "id": 15,
+    "color":"brown",
+    "reserved" : 2,
+    "maxBounty": 1,
+    "title": "TESTING2",
+    "year": "1922",
+    "description1": "Ether-arts.io",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/016-PaulSignac__Venice_The_Pink_Cloud_lg.jpg",
+    "image_sm": "artworks/016-PaulSignac__Venice_The_Pink_Cloud_sm.jpg",
+    "image_direction": "square",
+    "display": "false"
+  },
+  {
+    "note" : "diamond - 5 x 5.0 eth",
+    "id": 16,
+    "color":"diamond",
+    "reserved" : 0,
+    "maxBounty": 0,
+    "title": "diamond-title",
+    "year": "1922",
+    "description1": "Ether-arts.io",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/017-gen25_Aquarelle Noveau_Purple_Bias_lg.jpg",
+    "image_sm": "artworks/017-gen25_Aquarelle Noveau_Purple_Bias_sm.jpg",
+    "image_direction": "square",
+    "recipe1": "gold",
+    "recipe2": "silver",
+    "display": "false"
+  },
+  {
+    "note" : "sapphire - 5 x 5.0 eth",
+    "id": 17,
+    "color":"sapphire",
+    "reserved" : 0,
+    "maxBounty": 0,
+    "title": "sapphire-title",
+    "year": "1922",
+    "description1": "Ether-arts.io",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/018-OdilonRedon__LargeGreenVase_with_MixedFlowers_lg.jpg",
+    "image_sm": "artworks/018-OdilonRedon__LargeGreenVase_with_MixedFlowers_sm.jpg",
+    "image_direction": "square",
+    "recipe1": "gold",
+    "recipe2": "silver",
+    "display": "false"
+  },
+  {
+    "note" : "emerald - 5 x 5.0 eth",
+    "id": 18,
+    "color":"emerald",
+    "reserved" : 0,
+    "maxBounty": 0,
+    "title": "emerald-title",
+    "year": "1922",
+    "description1": "Ether-arts.io",
+    "description2": "",
+    "addressForArtist": "0x59a67BD895A143A030bEb3B9F0A64d4f5f14d7f0",
+    "rrForArtist": 10,
+    "image_lg": "artworks/019-gen1_Sargent_lg.jpg",
+    "image_sm": "artworks/019-gen1_Sargent_sm.jpg",
+    "image_direction": "square",
+    "recipe1": "gold",
+    "recipe2": "silver",
+    "display": "false"
+  }
+];
+
+module.exports = function(deployer) {
+  deployer.then(async () => {
+
+    var IF_EAS_types = await EAS_types.deployed();
+    console.log("Register Ether-arts Cards!");
+
+    jsonData = JSON.parse(JSON.stringify(jsonDataRaw));
+
+    for(var type = 0; type < jsonData.length; type++){
+      if(cardColorEnum[jsonData[type].color.toUpperCase()] >= cardColorEnum.AMBER){
+        await IF_EAS_types.RegisterArtwork(jsonData[type].addressForArtist, jsonData[type].priceInFinny, jsonData[type].totalSupply, jsonData[type].reserved, jsonData[type].maxBounty, jsonData[type].rrForArtist, jsonData[type].title, jsonData[type].description1, cardColorEnum[`${jsonData[type].color}`.toUpperCase()], cardColorEnum[`${jsonData[type].recipe1}`.toUpperCase()], cardColorEnum[`${jsonData[type].recipe2}`.toUpperCase()]);
+      }else{
+        await IF_EAS_types.RegisterArtwork(jsonData[type].addressForArtist, jsonData[type].priceInFinny, jsonData[type].totalSupply, jsonData[type].reserved, jsonData[type].maxBounty, jsonData[type].rrForArtist, jsonData[type].title, jsonData[type].description1, cardColorEnum[`${jsonData[type].color}`.toUpperCase()], 0, 0);
+      }
+    }
+
+
+  });
+}
+

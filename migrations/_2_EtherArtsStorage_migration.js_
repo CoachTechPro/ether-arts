@@ -1,0 +1,17 @@
+var EAS = artifacts.require("./EAS.sol");
+var EAS_types = artifacts.require("./EAS_types.sol");
+var EAS_artworks = artifacts.require("./EAS_artworks.sol");
+var EAS_roll = artifacts.require("./EAS_roll.sol");
+var EAS_mission = artifacts.require("./EAS_mission.sol");
+var EAS_mixedQuery = artifacts.require("./EAS_mixedQuery.sol");
+
+module.exports = function(deployer) {
+  deployer.then(async () =>{
+    await deployer.deploy(EAS_types);
+    await deployer.deploy(EAS_artworks);
+    await deployer.deploy(EAS_roll, EAS_artworks.address);
+    await deployer.deploy(EAS, EAS_artworks.address);
+    await deployer.deploy(EAS_mixedQuery, EAS_types.address, EAS_artworks.address);
+    await deployer.deploy(EAS_mission, EAS.address, EAS_artworks.address);
+  })
+};
