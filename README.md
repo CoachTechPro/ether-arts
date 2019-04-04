@@ -1,4 +1,4 @@
-# ETHER-ARTS, CONTRACTS BUG BOUNTY(~ 5 APR, 2019)
+# ETHER-ARTS, CONTRACTS BUG BOUNTY(~ 12 APR, 2019)
 The world's first crypto-collectible card with direct ethereum compensation.
 
 ### About Ether-arts
@@ -9,7 +9,7 @@ Ether-arts card complies with the ERC721 standard on ethereum, so it can be boug
 We are currently on the Rinkeby test network, so this bountry hunt will take place within the Rinkeby network.
 
 ### Scope
-* Dates : ~ 11:59pm GMT, 5 APR, 2019
+* Dates : ~ 11:59pm GMT, 12 APR, 2019
 * Network : Rinkeby test network
 * Please help us identify any bug, vulnerability or malfunction in the smart contract such as:
   * Buying, transferring ether-arts card
