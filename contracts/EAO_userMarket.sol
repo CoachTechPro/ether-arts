@@ -64,6 +64,7 @@ contract EAO_userMarket is Ownable{
 
     IFEAS_artworks.ResetUserParameters(_cardId);
     IFEAS_artworks.SetArtworksOwner(_cardId, msg.sender);
+    IFEAS_artworks.UpdateArtworksTimestampLastTransfer(_cardId);
 
     emit EventUserMarketBuy(sellerAddr, msg.sender, finny_value, _cardId);
     return true;

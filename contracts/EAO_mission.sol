@@ -21,6 +21,7 @@ contract EAO_mission is Ownable{
   uint gasPriceForOracleQuery = 6000000000;
   uint gasLimitForOracleQuery = 1000000;
   address EAS_backup_address;
+  uint[5] timeDelay = [0, 60, 60*60, 60*60*24, 60*60*24*7];
 
   IF_EAS_artworks   IFEAS_artworks;
   IF_EAS_types      IFEAS_types;
@@ -31,7 +32,8 @@ contract EAO_mission is Ownable{
   IF_EAM            IFEAM;
   IF_EAO            IFEAO;
 
-  event EventMission(uint indexed stageNo, uint totalTypes, uint rn1, uint rn2, uint rn3, uint indexed win1, uint indexed win2);
+  event EventMissionGenerated(uint indexed stageNo, uint32 indexed blockNo, bytes32 queryId);
+  event EventMissionResult(uint indexed stageNo, uint totalTypes, uint rn1, uint rn2, uint rn3, uint indexed win1, uint indexed win2);
   event EventRewardClaimed(address indexed player, uint indexed stageNo, uint rewardInFinny);
 
   modifier platform() {     /* Only EtherArts Platform (EtherArtsOperations, EtherArtsStorage, EtherArtsOracle, Contract owner) can access this contract */
@@ -73,7 +75,7 @@ contract EAO_mission is Ownable{
 
 
 
-  function PlayMission() public platform{
+  function PlayMission(uint8 delayType) public platform{
     uint stageNo = IFEAS.stageNo();
     // have to add time constraint => Time period between last call and this call have to be longer than 5 days!!
     if (IFEAO.oraclize_getPrice("URL") > msg.sender.balance) {
@@ -82,10 +84,12 @@ contract EAO_mission is Ownable{
       IFEAO.oraclize_setCustomGasPrice(gasPriceForOracleQuery); // set gas price to 5 Gwei
 
       uint typeLength = IFEAS_types.GetArtworkTypesLength() - 1;
-      bytes32 queryId = IFEAO.oraclize_query("WolframAlpha", "3 unique random numbers between 0 to 100000", gasLimitForOracleQuery);
+      bytes32 queryId = IFEAO.oraclize_query(timeDelay[delayType], "WolframAlpha", "3 unique random numbers between 0 to 100000", gasLimitForOracleQuery);
       //bytes32 queryId = IFEAO.oraclize_query("WolframAlpha", "3 unique random numbers between 0 to ".toSlice().concat(IFEAS.toString(typeLength).toSlice()), gasLimitForOracleQuery);
       IFEAS_mission.SetPlayMissionId(queryId, true);
       IFEAS_mission.SetIdToStage(queryId, stageNo);
+
+      emit EventMissionGenerated(stageNo, uint32(now), queryId);
     }
   }
 
@@ -116,15 +120,18 @@ contract EAO_mission is Ownable{
     uint totalTypes = IFEAS_types.GetArtworkTypesLength();
     uint missionRange = IFEAS_mission.GetRecentRangeOffset();
 
+    // prepare one rn
     uint winnerType1 = rn1.mod(totalTypes);
     uint winnerType2 = 0;
     uint winnerType3 = 0;
 
     if(totalTypes < missionRange){
-      // select 2 different random cards
-    winnerType2 = rn2.mod(totalTypes);
-    winnerType3 = rn3.mod(totalTypes);
+      // prepare two more rns
+      winnerType2 = rn2.mod(totalTypes);
+      winnerType3 = rn3.mod(totalTypes);
 
+      // equality test : we do not want get two same numbers.
+      // we'll finally select winnerType1, winnerType2
       if(winnerType1 == winnerType2){
         winnerType2 = winnerType3;
         if(winnerType1 == winnerType2){
@@ -137,21 +144,21 @@ contract EAO_mission is Ownable{
 
     }else if(totalTypes >= missionRange){
       // select 1 from all range, 1 from recent recentRangeOffset cards.
-      winnerType2 = totalTypes - rn2.mod(missionRange);
-      winnerType3 = totalTypes - rn3.mod(missionRange);
+      winnerType2 = (totalTypes - 1) - rn2.mod(missionRange);
+      winnerType3 = (totalTypes - 1) - rn3.mod(missionRange);
 
       if(winnerType1 == winnerType2){
         winnerType2 = winnerType3;
         if(winnerType1 == winnerType2){
-          winnerType2 = totalTypes - (winnerType1.add(winnerType2).add(winnerType3)).mod(missionRange);
+          winnerType2 = (totalTypes - 1) - (winnerType1.add(winnerType2).add(winnerType3)).mod(missionRange);
           if(winnerType1 == winnerType2){
-            winnerType2 = totalTypes - (winnerType1.mul(winnerType2).add(winnerType3)).mod(missionRange);
+            winnerType2 = (totalTypes - 1) - (winnerType1.mul(winnerType2).add(winnerType3)).mod(missionRange);
           }
         }
       }
     }
 
-    emit EventMission(IFEAS.stageNo(), uint(totalTypes), rn1, rn2, rn3, winnerType1, winnerType2);
+    emit EventMissionResult(IFEAS.stageNo(), uint(totalTypes), rn1, rn2, rn3, winnerType1, winnerType2);
     AssignMissionWinners(IFEAS.stageNo(), uint64(winnerType1), uint64(winnerType2));
   }
 
@@ -210,7 +217,7 @@ contract EAO_mission is Ownable{
       IFEAS_mission.SetReward(stageNo, IFEAS_mission.GetWinner2(stageNo, i), reward2);  // second prize winners (winnertype1 card only)
     }
     for(uint i=0; i<IFEAS_mission.GetWinner3Length(stageNo); i++){
-      //                      stageNo,            Winner2,                   reward
+      //                      stageNo,            Winner3,                   reward
       IFEAS_mission.SetReward(stageNo, IFEAS_mission.GetWinner3(stageNo, i), reward3);  // second prize winners (winnertype2 card only)
     }
 
@@ -220,6 +227,7 @@ contract EAO_mission is Ownable{
 
 
 
+  /* Winners will call this function from js frontend */
   function RewardClaim(uint _stageNo, address _Owner) public {
     require(msg.sender == _Owner, "Only account holder can claim own reward!, RewardClaim");
     require(IFEAS_mission.GetUserStageReward(_stageNo, _Owner) > 0, "Invalid Request, RewardClaim");

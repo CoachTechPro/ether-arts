@@ -192,7 +192,27 @@ contract EAS is Ownable{
     return (types, cardId, cardOwner, cardRecipeUsed, cardUserSellFlag, cardUserPriceInFinny);
   }
 
+  function GetCardInfo2(address _address) public view returns(uint[] memory, uint[] memory){
+    uint length;
+    if(_address == address(0x1000000000000000000000000000000000000001)){ 
+      length = IFEAS_artworks.GetArtworksLength();
+    } else {
+      length = IFEAS_artworks.ownerArtworkCount(_address);
+    }
+    uint[] memory cardCreationTimestamp = new uint[](length);
+    uint[] memory cardLastTransferTimestamp = new uint[](length);
 
+    uint userCardIdx = 0;
+    for(length = 0; length < IFEAS_artworks.GetArtworksLength(); length++){
+      if(_address == IFEAS_artworks.GetArtworksOwner(length) || (_address == address(0x1000000000000000000000000000000000000001))){
+
+        cardCreationTimestamp[userCardIdx] = IFEAS_artworks.GetArtworksTimestampCreated(length);
+        cardLastTransferTimestamp[userCardIdx] = IFEAS_artworks.GetArtworksTimestampLastTransfer(length);
+        userCardIdx++;
+      }
+    }
+    return (cardCreationTimestamp, cardLastTransferTimestamp);
+  }
 
 //https://github.com/willitscale/solidity-util/blob/master/lib/Integers.sol
 /*

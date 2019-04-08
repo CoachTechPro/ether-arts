@@ -2,9 +2,6 @@ pragma solidity >= 0.5.0;
 
 contract IF_EAS_artworks{
  
-  uint public cardHolderCount = 0;
-  uint public buyTried = 0;
-
   mapping(address  => uint32) public ownerArtworkCount;  // saves the number of artworks for each user(address)
   mapping(uint32 => uint[])   public tokenIds;           // type --> token IDs
   mapping(uint => string)     public tokenURIs;          // tokenId to URI
@@ -14,7 +11,7 @@ contract IF_EAS_artworks{
   //function GetAllAddressesAllowed() public returns (address[] memory);
 
   /* GENERATE AN INSTANCE OF CARD */
-  function GenerateEtherArt(address _player, uint _tokenId, uint32 _typeIndex, uint32 _timestamp, uint64 _localSeq, bool _userSellFlag, uint32 _userPriceInFinny, bool _recipeUsed) external;
+  function GenerateEtherArt(address _player, uint _tokenId, uint32 _typeIndex, uint _timestamp, uint8 _creation_method, uint64 _localSeq, bool _userSellFlag, uint32 _userPriceInFinny, bool _recipeUsed) external;
   
   /***********************************************/
   /*             ARTWORKS INTERFACE              */
@@ -31,14 +28,18 @@ contract IF_EAS_artworks{
   function GetArtworksLength() public view returns(uint);
   function SetArtworksOwner(uint _idx, address _owner) external;
   function GetArtworksOwner(uint _idx) public view returns(address);
+
   //function SetArtworksType(uint _idx, uint32 _type);
+
   function GetArtworksType(uint _idx) public view returns(uint32);
   function SetArtworksUserSellFlag(uint _idx, bool _val) internal;
   function GetArtworksUserSellFlag(uint _idx) public view returns(bool);
   function SetArtworksUserPriceInFinny(uint _idx, uint32 _priceInFinny) internal;
   function GetArtworksUserPriceInFinny(uint _idx) public view returns(uint32);
-  //function SetArtworksTimestamp(uint _idx, uint32 _timestamp);
-  function GetArtworksTimestamp(uint _idx) public view returns(uint32);
+
+  function GetArtworksTimestampCreated(uint _idx) public view returns(uint);
+  function UpdateArtworksTimestampLastTransfer(uint _idx) external;
+  function GetArtworksTimestampLastTransfer(uint _idx) public view returns(uint);
   function SetArtworksRecipeUsed(uint _idx) external;
   function GetArtworksRecipeUsed(uint _idx) public view returns(bool);
   //function SetArtworksTokenId(uint _idx, uint _tokenId) returns(uint);

@@ -75,7 +75,6 @@ contract EAO_roll is Ownable{
       IFEAS_roll.SetIdToBetPrice(queryId, _msgValue);
       IFEAS_roll.SetIdToRollTarget(queryId, _type);
     }
-  
   }
 
   function SetGasPrice(uint price) external onlyOwner{ // default : 5000000000 (5 Gwei)
@@ -130,10 +129,7 @@ contract EAO_roll is Ownable{
     // increase owner's artwork count
 
     address player = IFEAS_roll.GetIdToPlayer(queryId);
-    uint32 target = IFEAS_roll.GetIdToRollTarget(queryId);
-
-    IFEAS_artworks.SetOwnerArtworkCount(player, uint32(IFEAS_artworks.ownerArtworkCount(player).add(1)));
-    
+    uint32 target = IFEAS_roll.GetIdToRollTarget(queryId);    
     uint tokenId = IFEAS_artworks.GetArtworksLength();
 
     // roll winner count ++
@@ -141,9 +137,10 @@ contract EAO_roll is Ownable{
     
     // card holder count ++
     IFEAS_artworks.UpdateCardHolderCount(player); // card holder count ++
+    IFEAS_artworks.SetOwnerArtworkCount(player, uint32(IFEAS_artworks.ownerArtworkCount(player).add(1)));
 
-    // Create new card and set       owner, tokenId, typeIndex,    timestamp,   sold (local seq),                       userSellFlag, userPriceInFinny,                   recipeUsed
-    IFEAS_artworks.GenerateEtherArt(player, tokenId, target, uint32(now), IFEAS_types.GetArtworkTypesSold(target), false, IFEAS.GetDefaultUserPriceInFinny(), false); // msg.sender == EAO
+    // Create new card and set       owner, tokenId, typeIndex, timestamp, 2:roll, local seq,                         userSellFlag, userPriceInFinny,            recipeUsed
+    IFEAS_artworks.GenerateEtherArt(player, tokenId, target, block.timestamp, 2, IFEAS_types.GetArtworkTypesSold(target), false, IFEAS.GetDefaultUserPriceInFinny(), false); // msg.sender == EAO
   
     // tokenId marking for cards management
     IFEAS_artworks.AppendTokenIdToTypeId(target, tokenId);

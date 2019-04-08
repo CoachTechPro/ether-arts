@@ -73,6 +73,7 @@ contract EAM is Ownable{
     IFEAS_artworks.SetOwnerArtworkCount(_to, uint32(IFEAS_artworks.ownerArtworkCount(_to).add(1)));
     IFEAS_artworks.SetOwnerArtworkCount(_from, uint32(IFEAS_artworks.ownerArtworkCount(_from).sub(1)));
     IFEAS_artworks.SetArtworksOwner(_tokenId, _to);
+    IFEAS_artworks.UpdateArtworksTimestampLastTransfer(_tokenId);
     emit Transfer(_from, _to, _tokenId);
   }
 
@@ -122,8 +123,8 @@ contract EAM is Ownable{
 
     uint tokenId = IFEAS_artworks.GetArtworksLength();
 
-    // Create new card and set owner, tokenId, typeIndex,   timestamp,   localSeq,                              userSellFlag, userPriceInFinny,          recipeUsed
-    IFEAS_artworks.GenerateEtherArt(_address, tokenId, _artworkType, uint32(now), IFEAS_types.GetArtworkTypesSold(_artworkType), false, IFEAS.GetDefaultUserPriceInFinny(), false);
+    // Create new card and set         owner, tokenId, typeIndex,    creat/transaction time, 4:Bounty, localSeq,                    userSellFlag, userPriceInFinny,            recipeUsed
+    IFEAS_artworks.GenerateEtherArt(_address, tokenId, _artworkType, block.timestamp, 4, IFEAS_types.GetArtworkTypesSold(_artworkType), false, IFEAS.GetDefaultUserPriceInFinny(), false);
 
     //IFEAS_artworks.AddBountyInfo(uint(_artworkType), tokenId);
 
@@ -156,8 +157,8 @@ contract EAM is Ownable{
     IFEAS_artworks.SetArtworksRecipeUsed(_id1); //platform
     IFEAS_artworks.SetArtworksRecipeUsed(_id2); //platform
 
-    // Create new card and set           owner, tokenId,               typeIndex,   timestamp,    localSeq,                               userSellFlag, userPriceInFinny,                   recipeUsed
-    IFEAS_artworks.GenerateEtherArt(msg.sender, tokenId, uint32(_targetCardType), uint32(now), IFEAS_types.GetArtworkTypesSold(_targetCardType), false, IFEAS.GetDefaultUserPriceInFinny(), false);
+    // Create new card and set           owner, tokenId, typeIndex,               timestamp,   6: special card claim, localSeq,                     userSellFlag, userPriceInFinny,            recipeUsed
+    IFEAS_artworks.GenerateEtherArt(msg.sender, tokenId, uint32(_targetCardType), block.timestamp, 6, IFEAS_types.GetArtworkTypesSold(_targetCardType), false, IFEAS.GetDefaultUserPriceInFinny(), false);
 
     // tokenId marking for cards management
     IFEAS_artworks.AppendTokenIdToTypeId(uint32(_targetCardType), tokenId); //platform

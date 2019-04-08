@@ -57,7 +57,7 @@ contract IF_EAS{
   //function GetTeamAddress() public view returns(address);
 
   function GetCardInfo(address _address) public view returns(uint32[] memory, uint64[] memory, address[] memory, bool[] memory, bool[] memory, uint32[] memory);
-
+  function GetCardInfo2(address _address) public view returns(uint[] memory, uint[] memory);
 //https://github.com/willitscale/solidity-util/blob/master/lib/Integers.sol
   //function parseInt(string memory _value) public returns (uint _ret);
   function toString(uint _base) public returns (string memory);

@@ -17,9 +17,11 @@ contract EAS_artworks is Ownable{
     address owner;
     uint tokenId;       // card global seq ID (All-EtherArts' global sequence) 
     uint32 typeIndex;   // picture number
-    uint32 timestamp;   // salt for generate random numbers
+    uint   blkno_Created;   // was timestamp
+    uint   blkno_LastTransfer;
+    uint8  createdMethod;  // 1:buy  2:roll  3:userMarket  4:bounty  5:transfer  6:specialCardClaim
     uint64 localSeq;    // card local seq ID (same picture cards)
-    bool userSellFlag;  // Ether-Arts' user marketplace sell flag
+    bool   userSellFlag;  // Ether-Arts' user marketplace sell flag
     uint32 userPriceInFinny;   // user's wanted price for user market
     bool recipeUsed;
   }
@@ -43,9 +45,10 @@ contract EAS_artworks is Ownable{
 
 
   /* GENERATE AN INSTANCE OF CARD */
-  function GenerateEtherArt(address _player, uint _tokenId, uint32 _typeIndex, uint32 _timestamp, uint64 _localSeq, bool _userSellFlag, uint32 _userPriceInFinny, bool _recipeUsed) external platform{
+  function GenerateEtherArt(address _player, uint _tokenId, uint32 _typeIndex, uint _timestamp, uint8 _creationgMode, uint64 _localSeq, bool _userSellFlag, uint32 _userPriceInFinny, bool _recipeUsed) external platform{
     // add some protection
-    artworks.push(singleArtwork(_player, _tokenId, _typeIndex, _timestamp, _localSeq, _userSellFlag, _userPriceInFinny, _recipeUsed));
+    // Create new card and set  owner,   tokenId,  typeIndex,  creation tm, transaction tm, creat mode, localSeq, userSellFlag,  userPriceInFinny, recipeUsed
+    artworks.push(singleArtwork(_player, _tokenId, _typeIndex, _timestamp, _timestamp, _creationgMode, _localSeq, _userSellFlag, _userPriceInFinny, _recipeUsed));
   }
 
 
@@ -96,50 +99,62 @@ contract EAS_artworks is Ownable{
     return artworks.length;
   }
   function SetArtworksOwner(uint _idx, address _owner) external platform{
-    require(_idx >= 0 && _idx <artworks.length, "Index out of range, SetArtworksOwner");
+    require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 1");
     artworks[_idx].owner = _owner;
   }
   function GetArtworksOwner(uint _idx) public view returns(address){
-    require(_idx >= 0 && _idx <artworks.length, "Index out of range, GetArtworksOwner");
+    require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 2");
     return artworks[_idx].owner;
   }
   function GetArtworksType(uint _idx) public view returns(uint32){
-    require(_idx >= 0 && _idx <artworks.length, "Index out of range, GetArtworksType");
+    require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 3");
     return artworks[_idx].typeIndex;
   }
   function SetArtworksUserSellFlag(uint _idx, bool _val) internal{
-    require(_idx >= 0 && _idx <artworks.length, "Index out of range, SetArtworksUserSellFlag");
+    require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 4");
     artworks[_idx].userSellFlag = _val;
   }
   function GetArtworksUserSellFlag(uint _idx) public view returns(bool){
-    require(_idx >= 0 && _idx <artworks.length, "Index out of range, GetArtworksUserSellFlag");
+    require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 5");
     return artworks[_idx].userSellFlag;
   }
 
   function SetArtworksUserPriceInFinny(uint _idx, uint32 _priceInFinny) internal{
-    require(_idx >= 0 && _idx <artworks.length, "Index out of range, SetArtworksUserPriceInFinny");
+    require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 6");
     artworks[_idx].userPriceInFinny = _priceInFinny;
   }
+  
   function GetArtworksUserPriceInFinny(uint _idx) public view returns(uint32){
-    require(_idx >= 0 && _idx <artworks.length, "Index out of range, GetArtworksUserPriceInFinny");
+    require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 7");
     return artworks[_idx].userPriceInFinny;
   }
 
-  function GetArtworksTimestamp(uint _idx) public view returns(uint32){
-    require(_idx >= 0 && _idx <artworks.length, "Index out of range, GetArtworksTimestamp");
-    return artworks[_idx].timestamp;
+  function GetArtworksTimestampCreated(uint _idx) public view returns(uint){
+    require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 8");
+    return artworks[_idx].blkno_Created;
   }
+
+  function UpdateArtworksTimestampLastTransfer(uint _idx) external platform{
+    require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 9");
+    artworks[_idx].blkno_LastTransfer = block.timestamp;
+  }
+
+  function GetArtworksTimestampLastTransfer(uint _idx) public view returns(uint){
+    require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 10");
+    return artworks[_idx].blkno_LastTransfer;
+  }
+
   function SetArtworksRecipeUsed(uint _idx) external platform{
-    require(_idx >= 0 && _idx <artworks.length, "Index out of range, SetArtworksRecipeUsed");
+    require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 11");
     artworks[_idx].recipeUsed = true;
   }
   function GetArtworksRecipeUsed(uint _idx) public view returns(bool){
-    require(_idx >= 0 && _idx <artworks.length, "Index out of range, GetArtworksRecipeUsed");
+    require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 12");
     return artworks[_idx].recipeUsed;
   }
 
   function GetArtworksTokenId(uint _idx) view public returns(uint64){ // external onlyOwner
-  require(_idx >= 0 && _idx <artworks.length, "Index out of range, GetArtworksTokenId");
+  require(_idx >= 0 && _idx <artworks.length, "IDX OOR, 13");
     return uint64(artworks[_idx].tokenId);
   }
 /*
@@ -206,7 +221,7 @@ contract EAS_artworks is Ownable{
   }
 
   function GetTokenId(uint32 _typeId, uint _index) public view returns(uint){
-    require(_index < tokenIds[_typeId].length, "_index out of range");
+    require(_index < tokenIds[_typeId].length, "IDX OOR,14");
     return tokenIds[_typeId][_index];
   }
 

@@ -2,8 +2,6 @@ pragma solidity >= 0.5.0;
 
 contract IF_EAS_mission{
 
-  event EventMission(uint indexed stageNo, uint totalTypes, uint rn1, uint rn2, uint rn3);
-
   /***********************************************/
   /*       MAPPING FOR MISSION INTERFACE         */
   /***********************************************/

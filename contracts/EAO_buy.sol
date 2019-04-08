@@ -58,8 +58,8 @@ contract EAO_buy is Ownable{
     IFEAS_artworks.SetOwnerArtworkCount(_msgSender, uint32(IFEAS_artworks.ownerArtworkCount(_msgSender).add(1)));
 
     uint tokenId = IFEAS_artworks.GetArtworksLength();
-    // Create new card and set      owner, tokenId,      typeIndex,    timestamp,   localSeq,                              userSellFlag, userPriceInFinny,          recipeUsed
-    IFEAS_artworks.GenerateEtherArt(_msgSender, tokenId, _artworkType, uint32(now), IFEAS_types.GetArtworkTypesSold(_artworkType), false, IFEAS.GetDefaultUserPriceInFinny(), false);
+    // Create new card and set      owner,      tokenId, typeIndex,    timestamp,   1:marketBuy, localSeq,                            userSellFlag, userPriceInFinny,            recipeUsed
+    IFEAS_artworks.GenerateEtherArt(_msgSender, tokenId, _artworkType, block.timestamp, 1, IFEAS_types.GetArtworkTypesSold(_artworkType), false, IFEAS.GetDefaultUserPriceInFinny(), false);
 
     // tokenId marking for cards management
     IFEAS_artworks.AppendTokenIdToTypeId(_artworkType, tokenId);

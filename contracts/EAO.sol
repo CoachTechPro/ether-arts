@@ -83,8 +83,8 @@ contract EAO is usingOraclize, Ownable{
     IFEAO_roll.PlayRoll(_artworkId, msg.sender, msg.value, msg.sender.balance);
   }
 
-  function PlayMission() public onlyOwner{
-    IFEAO_mission.PlayMission();
+  function PlayMission(uint8 delayType) public onlyOwner{
+    IFEAO_mission.PlayMission(delayType);
   }
 
   function BuyArtwork(uint32 _artworkType) external payable returns(uint) {
