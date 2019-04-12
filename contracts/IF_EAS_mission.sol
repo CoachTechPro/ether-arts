@@ -18,7 +18,7 @@ contract IF_EAS_mission{
   function FinalizeStage(uint _stageNo) public;
   function SetStageRewards(uint _stageNo, uint _reward1, uint _reward2, uint _reward3) public;
   //function GetStageRewards(uint _stageNo) public view returns (uint, uint);
-  function GetStageRewardsHistory() public view returns (uint[] memory, uint[] memory, uint[] memory);
+  //function GetStageRewardsHistory() public view returns (uint[] memory, uint[] memory, uint[] memory);
   function SetStageTargets(uint _stageNo, uint64 num1, uint64 num2) external;
   //function GetStageTargets(uint _stageNo) view public returns(uint64, uint64);
 

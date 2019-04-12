@@ -21,11 +21,10 @@ contract IF_EAO{
   function oraclize_cbAddress() public returns (address);
   function oraclize_setCustomGasPrice(uint) public;
 
-  function AssignReward(uint stageNo, address _EAO_MISSION_ADDR) public ;
-  function CalculateRewardForWinner(uint _stageNo) public view returns(uint, uint, uint);
+  function AssignReward(uint stageNo, address _EAO_MISSION_ADDR) public;
 
   //function FundBackupToEAS() external;
   function TransferFund(address _addressTo, uint _amountInWei) public;
   function GetBalance() public view returns(uint);
-  function GetBalanceInFinny() public view returns(uint);
+  //function GetBalanceInFinny() public view returns(uint);
 }

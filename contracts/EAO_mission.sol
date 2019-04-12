@@ -77,20 +77,16 @@ contract EAO_mission is Ownable{
 
   function PlayMission(uint8 delayType) public platform{
     uint stageNo = IFEAS.stageNo();
-    // have to add time constraint => Time period between last call and this call have to be longer than 5 days!!
-    if (IFEAO.oraclize_getPrice("URL") > msg.sender.balance) {
-      //LogNewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
-    } else {
-      IFEAO.oraclize_setCustomGasPrice(gasPriceForOracleQuery); // set gas price to 5 Gwei
 
-      uint typeLength = IFEAS_types.GetArtworkTypesLength() - 1;
-      bytes32 queryId = IFEAO.oraclize_query(timeDelay[delayType], "WolframAlpha", "3 unique random numbers between 0 to 100000", gasLimitForOracleQuery);
-      //bytes32 queryId = IFEAO.oraclize_query("WolframAlpha", "3 unique random numbers between 0 to ".toSlice().concat(IFEAS.toString(typeLength).toSlice()), gasLimitForOracleQuery);
-      IFEAS_mission.SetPlayMissionId(queryId, true);
-      IFEAS_mission.SetIdToStage(queryId, stageNo);
+    IFEAO.oraclize_setCustomGasPrice(gasPriceForOracleQuery); // set gas price to 5 Gwei
 
-      emit EventMissionGenerated(stageNo, uint32(now), queryId);
-    }
+    uint typeLength = IFEAS_types.GetArtworkTypesLength() - 1;
+    bytes32 queryId = IFEAO.oraclize_query(timeDelay[delayType], "WolframAlpha", "3 unique random numbers between 0 to 100000", gasLimitForOracleQuery);
+    //bytes32 queryId = IFEAO.oraclize_query("WolframAlpha", "3 unique random numbers between 0 to ".toSlice().concat(IFEAS.toString(typeLength).toSlice()), gasLimitForOracleQuery);
+    IFEAS_mission.SetPlayMissionId(queryId, true);
+    IFEAS_mission.SetIdToStage(queryId, stageNo);
+
+    emit EventMissionGenerated(stageNo, uint32(now), queryId);
   }
 
   function SetGasPrice(uint price) external onlyOwner{ // default : 5000000000 (5 Gwei)
@@ -105,9 +101,9 @@ contract EAO_mission is Ownable{
     //require(msg.sender == oraclize_cbAddress(), "__callback_playmission : have to be called from oracle_cbaddress");
     require(IFEAS_mission.GetIdToStage(queryId) == IFEAS.stageNo(), "__callback_playmission : queryId to stageNo is not matched");
 
-    uint rn1 = 12;
-    uint rn2 = 34;
-    uint rn3 = 56;
+    uint rn1;
+    uint rn2;
+    uint rn3;
 
     strings.slice memory s = result.toSlice();
     strings.slice memory delim = ", ".toSlice();
@@ -135,7 +131,7 @@ contract EAO_mission is Ownable{
       if(winnerType1 == winnerType2){
         winnerType2 = winnerType3;
         if(winnerType1 == winnerType2){
-          winnerType2 = (winnerType1.add(winnerType2).add(winnerType3)).mod(totalTypes);
+          winnerType2 = (winnerType1.add(winnerType2 + winnerType3)).mod(totalTypes);
           if(winnerType1 == winnerType2){
             winnerType2 = (winnerType1.mul(winnerType2).add(winnerType3)).mod(totalTypes);
           }
@@ -150,62 +146,69 @@ contract EAO_mission is Ownable{
       if(winnerType1 == winnerType2){
         winnerType2 = winnerType3;
         if(winnerType1 == winnerType2){
-          winnerType2 = (totalTypes - 1) - (winnerType1.add(winnerType2).add(winnerType3)).mod(missionRange);
+          winnerType2 = (totalTypes - 1) - (winnerType1.add(winnerType2 + winnerType3)).mod(missionRange);
           if(winnerType1 == winnerType2){
             winnerType2 = (totalTypes - 1) - (winnerType1.mul(winnerType2).add(winnerType3)).mod(missionRange);
           }
         }
       }
     }
-
     emit EventMissionResult(IFEAS.stageNo(), uint(totalTypes), rn1, rn2, rn3, winnerType1, winnerType2);
     AssignMissionWinners(IFEAS.stageNo(), uint64(winnerType1), uint64(winnerType2));
   }
 
 
-
+  // Find the winners and Record winner addresses into internal structure
   function AssignMissionWinners(uint stageNo, uint64 winnerType1, uint64 winnerType2) public platform {  // external onlyOwner
-    uint reward1 = 0;
-    uint reward2 = 0;
-    uint reward3 = 0;
+    uint reward1;
+    uint reward2;
+    uint reward3;
 
-    /**************** SAVE WINNER CARDS HERE ********************/
+    /**************** RECORD WINNER CARDS HERE ********************/
     IFEAS_mission.SetStageTargets(stageNo, winnerType1, winnerType2);
 
-    /**************** WINNER CALCULATING & COUNTING ********************/
+    /**************** WINNER COUNTING ********************/
     uint card1Holders = IFEAS_artworks.GetTypeLength(uint32(winnerType1));
     uint card2Holders = IFEAS_artworks.GetTypeLength(uint32(winnerType2));
 
-    // loop for each address that has type1 card
+    // loop for each address that has winner-type-1 card
     for(uint i=0; i<card1Holders; i++){
+      // PLAYER A (he has winner-type-1 card)
       address winUser = IFEAS_artworks.GetArtworksOwner(IFEAS_artworks.GetTokenId(uint32(winnerType1), i)); // returns the address of owner that has i-th winnerType1 card
       bool isFirstWinner = false;
 
-      // loop for each address that has type 2 card
+      // check if PLAYER A has winner-type-2 card
       for(uint j=0; j<card2Holders; j++){
         if(winUser == IFEAS_artworks.GetArtworksOwner(IFEAS_artworks.GetTokenId(uint32(winnerType2), j))){
           isFirstWinner = true;
         }
       }
+
       if(isFirstWinner == true){
+        // if PLAYER A is first winner
         IFEAS_mission.AppendWinner1(stageNo, winUser);  // first prize winners
       }else{
-        IFEAS_mission.AppendWinner2(stageNo, winUser);  // second prize winners (owns winnerType1 only)
+        // if PLAYER A is not first winner, he only has winner-type-1 card.
+        IFEAS_mission.AppendWinner2(stageNo, winUser);  // second prize winners (owns winner-type-1 only)
       }
     }
 
+    // if PLAYER A has winner-type-2 card.
     for(uint i=0; i<card2Holders; i++){
       address winUser = IFEAS_artworks.GetArtworksOwner(IFEAS_artworks.GetTokenId(uint32(winnerType2), i)); // returns the address of owner that has i-th winnerType2 card
+      
+      // If PLAYER A has both two winner cards, he must be already marked as a winner1. so has to skip.
       if(IFEAS_mission.IsNewWinner1(stageNo, winUser) == true){   // if it is not in list1
         if(IFEAS_mission.IsNewWinner2(stageNo, winUser) == true){ // if it is not in list2
           IFEAS_mission.AppendWinner3(stageNo, winUser);          // second prize winners (owns winnerType2 only)
         }
       }
     }
- 
-    (reward1, reward2, reward3) = IFEAO.CalculateRewardForWinner(stageNo);
+
+    // DETERMINE REWARD AMOUNTS
+    (reward1, reward2, reward3) = CalculateRewardForWinner(stageNo);
     
-    // SAVE WINNER REWARDS HERE
+    // RECORD REWARDS FOR EACH GRADE
     IFEAS_mission.SetStageRewards(stageNo, reward1, reward2, reward3);
 
     for(uint i=0; i<IFEAS_mission.GetWinner1Length(stageNo); i++){
@@ -220,9 +223,42 @@ contract EAO_mission is Ownable{
       //                      stageNo,            Winner3,                   reward
       IFEAS_mission.SetReward(stageNo, IFEAS_mission.GetWinner3(stageNo, i), reward3);  // second prize winners (winnertype2 card only)
     }
-
     /* Fund transfer request from EAO to this contract for player reward claim */
     IFEAO.AssignReward(stageNo, address(this));
+  }
+
+
+  // calculate reward amounts to each mission winners (using EAO POOL)
+  function CalculateRewardForWinner(uint _stageNo) public view returns(uint, uint, uint){
+    /* returns amount of ethers for mission reward : If there is at least one winners */
+    uint reward1;
+    uint reward2;
+    uint reward3;
+    uint numWinner1 = IFEAS_mission.GetWinner1Length(_stageNo);
+    uint numWinner2 = IFEAS_mission.GetWinner2Length(_stageNo);
+    uint numWinner3 = IFEAS_mission.GetWinner3Length(_stageNo);
+
+    uint IFEAO_balance = IFEAO.GetBalance();
+    uint IFEAS_WINNER2_DIST_RATIO = IFEAS.WINNERS2_DIST_RATIO();
+
+    if(IFEAS_mission.GetWinner1Length(_stageNo) > 0){
+      reward1 = IFEAO_balance.mul(IFEAS.WINNERS1_DIST_RATIO()).div(100*numWinner1); 
+    }else{
+      reward1 = 0;
+    }
+    
+    if(IFEAS_mission.GetWinner2Length(_stageNo) > 0){
+      reward2 = IFEAO_balance.mul(IFEAS_WINNER2_DIST_RATIO).div(200*numWinner2);
+    }else{
+      reward2 = 0;
+    }
+
+    if(IFEAS_mission.GetWinner3Length(_stageNo) > 0){
+      reward3 = IFEAO_balance.mul(IFEAS_WINNER2_DIST_RATIO).div(200*numWinner3);
+    }else{
+      reward3 = 0;
+    }
+    return (reward1, reward2, reward3);
   }
 
 
@@ -230,9 +266,9 @@ contract EAO_mission is Ownable{
   /* Winners will call this function from js frontend */
   function RewardClaim(uint _stageNo, address _Owner) public {
     require(msg.sender == _Owner, "Only account holder can claim own reward!, RewardClaim");
-    require(IFEAS_mission.GetUserStageReward(_stageNo, _Owner) > 0, "Invalid Request, RewardClaim");
-    uint stageNo = IFEAS.stageNo();
     uint reward = IFEAS_mission.GetUserStageReward(_stageNo, _Owner);
+    require(reward > 0, "Invalid Request, RewardClaim");
+
     IFEAS_mission.SetReward(_stageNo, _Owner, 0);//unclaimedRewards[_stageNo][_Owner] = 0;
     
     address payable addrTo = address(uint160(_Owner));

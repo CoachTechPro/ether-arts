@@ -7,8 +7,8 @@ contract IF_EAO_mission{
   event EventRewardClaimed(address indexed player, uint indexed stageNo, uint rewardInFinny);
 
   function UpdateIFEAM(address _newIFEAM_addr) public;
-  function GetBalance() public returns(uint);
-  function GetBalanceInFinny() public view returns(uint);
+  //function GetBalance() public returns(uint);
+  //function GetBalanceInFinny() public view returns(uint);
 
   //function FundBackupToEAS() external;
 
@@ -16,7 +16,8 @@ contract IF_EAO_mission{
   function SetGasPrice(uint price) external;
   function SetGasLimit(uint limit) external;
   function __callback_PlayMission(bytes32 queryId, string memory result) public;
-  function AssignMissionWinners(uint stageNo, uint64 winType1, uint64 winType2) public;
-  function RewardClaim(uint _stageNo, address _Owner) public ;
+  function CalculateRewardForWinner(uint _stageNo) public view returns(uint, uint, uint);
+  //function AssignMissionWinners(uint stageNo, uint64 winType1, uint64 winType2) public;
+  //function RewardClaim(uint _stageNo, address _Owner) public ;
 
 }

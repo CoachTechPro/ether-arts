@@ -20,7 +20,7 @@ contract IF_EAS{
 
   function UpdateIFEAO(address _newIFEAO_addr) public;
 
-  function GetBalance() public view returns(uint);
+//  function GetBalance() public view returns(uint);
 //  function GetEAOBalanceInFinny() public view returns(uint);
 //  function GetEAOmissionBalanceInFinny() public view returns(uint);
 
@@ -56,9 +56,11 @@ contract IF_EAS{
   function SetTeamAddress(address _newAddr) external;
   //function GetTeamAddress() public view returns(address);
 
-  function GetCardInfo(address _address) public view returns(uint32[] memory, uint64[] memory, address[] memory, bool[] memory, bool[] memory, uint32[] memory);
-  function GetCardInfo2(address _address) public view returns(uint[] memory, uint[] memory);
-//https://github.com/willitscale/solidity-util/blob/master/lib/Integers.sol
+  //function GetCardInfo(address _address) public view returns(uint32[] memory, uint64[] memory, address[] memory, bool[] memory, bool[] memory, uint32[] memory);
+  //function GetCardInfo2(address _address) public view returns(uint[] memory, uint[] memory);
+  
+  
+  //https://github.com/willitscale/solidity-util/blob/master/lib/Integers.sol
   //function parseInt(string memory _value) public returns (uint _ret);
   function toString(uint _base) public returns (string memory);
 

@@ -8,10 +8,13 @@ import "./IF_EAO_mission.sol";
 contract EAS is Ownable{
   
   uint     public stageNo = 0;
-  uint8    public MARKETING_DISTRIBUTE_RATIO = 5;
-  address  public ADDRESS_MARKETING = address(0x10CbE0583c643f541E6B631351E533EECb6049E4); // now for testing, real address : 0x2DcCa9B61E50D79A90a813fcD6a42c3A3Ac52e6f;
+  
   uint8    public TEAM_DISTRIBUTE_RATIO = 35;
-  address  public ADDRESS_TEAM = address(0x7529498fa97BCfCf8BA50134Dd6298BD4b4B5b3F);      // now for testing.
+  address  public ADDRESS_TEAM = address(0x329977408a18452CCf905F48c78C4cD706fa9bAF);
+
+  uint8    public MARKETING_DISTRIBUTE_RATIO = 5;  
+  address  public ADDRESS_MARKETING = address(0x59aF58BEdBb211F44eC7e18a1b82CBAdD74417aA);
+  
   uint8    public WINNERS1_DIST_RATIO = 45;
   uint8    public WINNERS2_DIST_RATIO = 35;
 
