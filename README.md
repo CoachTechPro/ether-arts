@@ -1,4 +1,4 @@
-# ETHER-ARTS, CONTRACTS BUG BOUNTY(~ 12 APR, 2019)
+# ETHER-ARTS, CONTRACTS BUG BOUNTY(~ 12 APR, 2019) !CLOSED!
 The world's first crypto-collectible card with direct ethereum compensation.
 
 ### About Ether-arts
