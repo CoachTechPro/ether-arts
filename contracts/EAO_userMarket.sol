@@ -10,6 +10,11 @@ import "./IF_EAS_platform.sol";
 
 contract EAO_userMarket is Ownable{
 
+  int256 constant INT256_MIN = int256(uint256(1) << 255);
+  int256 constant INT256_MAX = int256(~(uint256(1) << 255));
+  uint256 constant UINT256_MIN = 0;
+  uint256 constant UINT256_MAX = ~uint256(0);
+
   using SafeMath for uint256;
   using SafeMath for uint32;
 
@@ -41,6 +46,61 @@ contract EAO_userMarket is Ownable{
   function GetBalance() public view returns(uint){
     return address(this).balance;
   }
+
+
+
+
+function ListUserOffer(uint32 _cardType, bool _claimedUsed) public view returns(address, uint, address, uint){
+
+  uint[] memory ownerPriceInFinny = IFEAS_artworks.GetAllUserPricesOfType(_cardType);
+  address[] memory ownerAddresses = IFEAS_artworks.GetAllOwnersOfType(_cardType);
+  uint[] memory tokenIds = IFEAS_artworks.GetTokenIdFromType(_cardType);
+  bool[] memory recipeUsed = IFEAS_artworks.GetAllRecipeUsedOfType(_cardType);
+
+  uint length = ownerPriceInFinny.length;
+
+  // finding lowest value over zero
+  uint lowest_value = UINT256_MAX;
+  uint lowest_idx = 1000;
+  uint next_value = UINT256_MAX;
+  uint next_idx = 1000;
+
+  for(uint i=0; i<length; i++){
+    if(ownerPriceInFinny[i] > 0 && recipeUsed[i] == _claimedUsed){
+      if(ownerPriceInFinny[i] < lowest_value){
+        lowest_value = ownerPriceInFinny[i];
+        lowest_idx = i;
+      }
+    }
+  }
+
+  for(uint i=0; i<length; i++){
+    if((ownerPriceInFinny[i] > lowest_value) && recipeUsed[i] == _claimedUsed){
+      if(ownerPriceInFinny[i] < next_value){
+        next_value = ownerPriceInFinny[i];
+        next_idx = i;
+      }
+    }
+  }
+  if(lowest_idx >= 120 && next_idx >= 120){
+    return (address(0),0,address(0),0);
+  }else if(lowest_idx < 120 && next_idx >= 120){
+    return (ownerAddresses[lowest_idx], ownerPriceInFinny[lowest_idx], address(0),0);
+  }else if(lowest_idx < 120 && next_idx < 120){
+    return (ownerAddresses[lowest_idx], ownerPriceInFinny[lowest_idx], ownerAddresses[next_idx], ownerPriceInFinny[next_idx]);
+  }
+}
+
+
+
+
+function ListingNextOffer(uint _cardType, uint _priceBest) public view returns(address, uint){
+
+}
+
+function IsUserMarketAvailable(uint _cardType) public view returns (bool){
+
+}
 
   function BuyOnTheUserMarket(uint _cardId) public payable sellFlagEnabled(_cardId) returns(bool){
     uint32 finny_value = IFEAS_artworks.GetArtworksUserPriceInFinny(_cardId);
